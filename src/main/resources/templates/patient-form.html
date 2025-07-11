@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>新規患者登録</title>
+</head>
+<body>
+    <h1>患者情報の入力</h1>
+    <form th:action="@{/patients}" th:object="${patient}" method="post">
+        <label>氏名：</label>
+        <input type="text" th:field="*{name}" /><br>
+
+        <label>性別：</label>
+        <select th:field="*{gender}">
+            <option value="男">男</option>
+            <option value="女">女</option>
+            <option value="その他">その他</option>
+        </select><br>
+
+        <label>生年月日：</label>
+        <input type="date" th:field="*{birthDate}" /><br>
+
+        <label>住所：</label>
+        <input type="text" th:field="*{address}" /><br>
+
+        <button type="submit">登録</button>
+    </form>
+</body>
+</html>
