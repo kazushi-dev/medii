@@ -59,6 +59,11 @@
     		<version>1.18.32</version>
     		<scope>provided</scope>
 		</dependency>
+		<dependency>
+    	<groupId>org.postgresql</groupId>
+    	<artifactId>postgresql</artifactId>
+    	<version>42.7.1</version> <!-- 最新安定版でOK -->
+		</dependency>
 	</dependencies>
 
 	<build>
