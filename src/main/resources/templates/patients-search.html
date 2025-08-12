@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <title th:text="${title}">患者検索</title>
+  <style>
+    body { font-family: sans-serif; margin: 0; }
+    header { background:#4CAF50; color:#fff; padding:12px 16px; font-size:22px; }
+    .wrap { display:flex; }
+    .content { flex:1; padding:16px; }
+    .side { width:260px; border-left:1px solid #ddd; padding:16px; }
+    table { width:100%; border-collapse: collapse; }
+    th, td { border:1px solid #ccc; padding:8px; text-align:left; }
+    th { background:#f6f6f6; }
+    .ctrl label { display:block; margin:8px 0 4px; }
+    .ctrl input { width:100%; padding:6px; box-sizing:border-box; }
+    .ctrl button { margin-top:10px; padding:8px 12px; }
+  </style>
+</head>
+<body>
+<header>患者検索</header>
+<div class="wrap">
+  <div class="content">
+    <table>
+      <thead>
+      <tr>
+        <th>ID</th>
+        <th>名前</th>
+        <th>フリガナ</th>
+        <th>性別</th>
+        <th>年齢</th>
+        <th>予約</th>
+      </tr>
+      </thead>
+      <tbody>
+      <tr th:each="p : ${patients}">
+        <td th:text="${p.id}">1</td>
+        <td th:text="${p.name}">山田太郎</td>
+        <td th:text="${p.kana}">ヤマダタロウ</td>
+        <td th:text="${p.gender}">男</td>
+        <td th:text="${p.age}">35</td>
+        <td>
+          <!-- 直近予約を表示（なければ空欄） -->
+          <span th:if="${latestMap[p.id] != null}"
+                th:text="${latestMap[p.id].type == T(com.example.demo.entity.ReservationType).DIAGNOSIS ? '診察' : 'カウ'}">診察</span>
+          <span th:if="${latestMap[p.id] != null}" th:text="${#temporals.format(latestMap[p.id].date, 'M/d')}">7/10</span>
+        </td>
+      </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <aside class="side">
+    <form class="ctrl" th:action="@{/patients/search}" method="get">
+      <label for="id">ID</label>
+      <input type="number" id="id" name="id" th:value="${qId}" />
+
+      <label for="name">名前</label>
+      <input type="text" id="name" name="name" th:value="${qName}" />
+
+      <label for="date">予約日</label>
+      <!-- 例: 2025-08-10 と入力。表示は M/d で出ます -->
+      <input type="date" id="date" name="date" th:value="${qDate}" />
+
+      <button type="submit">検索</button>
+    </form>
+  </aside>
+</div>
+</body>
+</html>

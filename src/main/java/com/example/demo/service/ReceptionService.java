@@ -1,13 +1,14 @@
 package com.example.demo.service;
 
+import com.example.demo.entity.Reception;
 import com.example.demo.entity.Patient;
 import com.example.demo.repository.PatientRepository;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.example.demo.repository.ReceptionRepository;
 import org.springframework.stereotype.Service;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 @Service
 public class ReceptionService {
@@ -15,21 +16,26 @@ public class ReceptionService {
     @Autowired
     private PatientRepository patientRepository;
 
-    // 現在受付中の患者一覧（簡易的にメモリ上で管理）
-    private List<Patient> receptionList = new ArrayList<>();
+    @Autowired
+    private ReceptionRepository receptionRepository;
 
-    // 受付リストを取得
-    public List<Patient> getReceptionList() {
-        return receptionList;
+    public List<Reception> getAllReceptions() {
+        return receptionRepository.findAll();
     }
 
-    // IDで検索して受付リストに追加
-    public void addPatientById(Long id) {
-        Optional<Patient> patient = patientRepository.findById(id);
-        patient.ifPresent(p -> {
-            if (!receptionList.contains(p)) {
-                receptionList.add(p);
-            }
-        });
+    public boolean isAlreadyRegistered(Long patientId) {
+        return receptionRepository.findByPatient(
+                patientRepository.findById(patientId).orElse(null)
+        ).isPresent();
+    }
+
+    @Transactional
+    public void register(Long patientId) {
+        Patient patient = patientRepository.findById(patientId).orElse(null);
+        if (patient != null) {
+            Reception reception = new Reception();
+            reception.setPatient(patient);
+            receptionRepository.save(reception);
+        }
     }
 }

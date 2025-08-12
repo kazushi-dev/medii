@@ -1,39 +1,39 @@
 package com.example.demo.controller;
 
-import com.example.demo.entity.Patient;
-import com.example.demo.service.PatientService;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.example.demo.entity.Reception;
+import com.example.demo.service.ReceptionService;
 import org.springframework.stereotype.Controller;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
 import java.util.List;
 
 @Controller
 public class ReceptionController {
 
     @Autowired
-    private PatientService patientService;
-
-    // 仮の受付リスト（今はメモリ上に保持。DB管理に切り替えてもOK）
-    private List<Patient> receptionList = new ArrayList<>();
+    private ReceptionService receptionService;
 
     @GetMapping("/reception")
     public String showReception(Model model) {
-        model.addAttribute("receptionList", receptionList); // 「受付中のみ」表示
+        List<Reception> receptionList = receptionService.getAllReceptions();
+        model.addAttribute("receptionList", receptionList);
         model.addAttribute("today", LocalDate.now());
-        model.addAttribute("newPatient", new Patient());
         return "reception";
     }
 
     @PostMapping("/reception/add")
-    public String addPatientToReception(@ModelAttribute("newPatient") Patient inputPatient) {
-        // IDでDBから取得して受付リストに追加
-        patientService.getPatientById(inputPatient.getId()).ifPresent(patient -> {
-            receptionList.add(patient);
-        });
+    public String addReception(@RequestParam("id") Long patientId, RedirectAttributes redirectAttributes) {
+        if (receptionService.isAlreadyRegistered(patientId)) {
+            redirectAttributes.addFlashAttribute("errorMessage", "この患者はすでに受付済みです。");
+        } else {
+            receptionService.register(patientId);
+        }
         return "redirect:/reception";
     }
 }

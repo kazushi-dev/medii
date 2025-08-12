@@ -2,6 +2,7 @@ package com.example.demo.entity;
 
 import jakarta.persistence.*;
 import java.time.LocalDate;
+import java.time.Period;
 
 @Entity
 public class Patient {
@@ -11,11 +12,23 @@ public class Patient {
     private Long id;
 
     private String name;
+    //フリガナ
+    @Column(length = 100)
+    private String kana;
+    
     private String gender;
     private LocalDate birthDate;
     private String address;
+    
+    //年齢、DBに列は作らない（画面用）
+    @Transient
+    public Integer getAge() {
+    	if (birthDate == null)return null;
+    	return Period.between(birthDate, LocalDate.now()).getYears();
+    }
 
     // --- Getter and Setter ---
+    //id, name, gender, birthDate, address, kana 
     public Long getId() {
         return id;
     }
@@ -30,6 +43,14 @@ public class Patient {
 
     public void setName(String name) {
         this.name = name;
+    }
+    
+    public String getKana() {
+    	return kana;
+    }
+    
+    public void setKana(String kana) {
+    	this.kana = kana;
     }
 
     public String getGender() {
